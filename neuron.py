@@ -1,14 +1,24 @@
 import numpy as np
 import random
 ###공식을 통해 계싼하는 대신 레이어별로 하도록 물론 효율은 나가 뒤졌고, 이해를 위해서.
-def activation_function(x):
+def sigmoid_function(x):
     return 1 / (1 + np.exp(-x))
+
+def relu_function(x):
+	return np.maximum(0, x)
+
+def softmax_function(x) :
+    exp_a = np.exp(x)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a   
+    return y
+
 class Neuron:
     def __init__(self, weights, bias):
         self.weights = weights
         self.bias = bias
 
-    def calculate_output(self, inputs):
+    def calculate_output(self, inputs, activation_function):
         result = []
         for i in range(len(inputs)):
             print(inputs, self.weights, i)
@@ -29,8 +39,8 @@ class Layer:
             )
             self.neurons.append(neuron)
 
-    def calculate_output(self, inputs):
+    def calculate_output(self, inputs, activation_function):
         outputs = []
         for neuron in self.neurons:
-            outputs.append(neuron.calculate_output(inputs))
+            outputs.append(neuron.calculate_output(inputs, activation_function))
         return outputs
