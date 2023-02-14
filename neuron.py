@@ -21,7 +21,6 @@ class Neuron:
     def calculate_output(self, inputs, activation_function):
         result = []
         for i in range(len(inputs)):
-            print(inputs, self.weights, i)
             weighted_input = inputs[i] * self.weights[i]
             result.append(weighted_input)
         weighted_inputs = result
@@ -44,3 +43,41 @@ class Layer:
         for neuron in self.neurons:
             outputs.append(neuron.calculate_output(inputs, activation_function))
         return outputs
+
+class NeuralNetwork:
+    def __init__(self, layer_sizes, activation_functions, activation_derivatives):
+        self.layers = []
+        self.activation_functions = activation_functions
+        self.activation_derivatives = activation_derivatives
+        for i in range(len(layer_sizes) - 1):
+            layer = Layer(layer_sizes[i + 1], layer_sizes[i])
+            self.layers.append(layer)
+
+    def calculate_output(self, inputs):
+        for i in range(len(self.layers)):
+            layer = self.layers[i]
+            inputs = layer.calculate_output(inputs, self.activation_functions[i])
+        return inputs
+    def train(self, inputs, targets, learning_rate):
+        outputs = self.calculate_output(inputs)
+        error = targets - outputs
+        derivative = error * self.activation_derivatives[-1](outputs)
+        delta = derivative * learning_rate
+        for i in range(len(self.layers) - 1, 0, -1):
+            layer = self.layers[i]
+            error = np.dot(delta, layer.neurons[0].weights)
+            derivative = error * self.activation_derivatives[i - 1](layer.calculate_output(inputs, self.activation_functions[i - 1]))
+            delta = derivative * learning_rate
+            for j in range(len(layer.neurons)):
+                neuron = layer.neurons[j]
+                neuron.weights += learning_rate * delta[j] * inputs
+                neuron.bias += learning_rate * delta[j]
+            inputs = layer.calculate_output(inputs, self.activation_functions[i - 1])
+
+
+network = NeuralNetwork(layer_sizes=[2, 3, 1],
+                        activation_functions=[sigmoid_function, sigmoid_function, sigmoid_function],
+                        activation_derivatives=[lambda x: sigmoid_function(x) * (1 - sigmoid_function(x)),
+                                                lambda x: sigmoid_function(x) * (1 - sigmoid_function(x)),
+                                                lambda x: sigmoid_function(x) * (1 - sigmoid_function(x))])
+print(network.calculate_output([1,5]))
