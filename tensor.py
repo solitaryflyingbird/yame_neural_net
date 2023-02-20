@@ -33,7 +33,7 @@ class Neuron:
     def calculate_output(self, inputs, activation_function):
         result = []
         for i in range(len(inputs)):
-            print(i, len(inputs))
+            #print(i, len(inputs))
             weighted_input = inputs[i] * self.weights[i]
             result.append(weighted_input)
         weighted_inputs = result
